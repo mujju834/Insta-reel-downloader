@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Video Downloader</title>
+    <link rel="icon" href="favicon.ico">
+    <style>
+        /* Global Styles */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 20px;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        input[type="text"] {
+            width: 80%;
+            max-width: 500px;
+            padding: 15px;
+            margin: 20px 0;
+            font-size: 16px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #007BFF;
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(1);
+        }
+
+        #result {
+            margin-top: 20px;
+            font-size: 18px;
+            color: green;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        #result a {
+            color: #28a745;
+            text-decoration: none;
+            font-weight: bold;
+            transition: color 0.3s;
+        }
+
+        #result a:hover {
+            color: #218838;
+            text-decoration: underline;
+        }
+
+        video {
+            margin-top: 20px;
+            width: 100%;
+            max-width: 500px;
+            height: auto;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .custom-controls {
+            margin-top: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .custom-controls button {
+            padding: 10px 15px;
+            font-size: 16px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .custom-controls button:hover {
+            background-color: #0056b3;
+        }
+
+        .custom-controls input[type="range"] {
+            width: 100px;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            margin: 20px auto;
+            width: 50px;
+            height: 50px;
+            border: 6px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 6px solid #007BFF;
+            animation: spin 1s linear infinite;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive Styles */
+        @media (min-width: 768px) {
+            body {
+                padding: 40px;
+            }
+
+            h1 {
+                font-size: 3rem;
+            }
+
+            input[type="text"] {
+                font-size: 18px;
+                padding: 15px;
+            }
+
+            button {
+                padding: 15px 30px;
+                font-size: 20px;
+                margin-top: 20px;
+            }
+
+            #result {
+                font-size: 20px;
+            }
+        }
+
+        @media (min-width: 1200px) {
+            h1 {
+                font-size: 3rem;
+            }
+
+            input[type="text"] {
+                font-size: 20px;
+                padding: 20px;
+                max-width: 600px;
+            }
+
+            button {
+                padding: 20px 40px;
+                font-size: 22px;
+            }
+
+            #result {
+                font-size: 22px;
+            }
+
+            video {
+                max-width: 500px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Instagram Reel Downloader</h1>
+    <input type="text" id="urlInput" placeholder="Enter Instagram Reel URL" />
+    <br>
+    <button onclick="downloadReel()">Get-Video</button>
+    <div class="spinner" id="spinner"></div>
+    <div id="result"></div>
+
+    <script>
+        function downloadReel() {
+            const url = document.getElementById('urlInput').value;
+            const spinner = document.getElementById('spinner');
+            const result = document.getElementById('result');
+
+            // Show the spinner and clear previous result
+            spinner.style.display = 'block';
+            result.innerHTML = '';
+
+            fetch('/download', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ url })
+            })
+            .then(response => response.json())
+            .then(data => {
+                spinner.style.display = 'none';  // Hide spinner after the response is received
+                if (data.downloadUrl) {
+                    result.innerHTML = `
+                        <video id="videoPlayer" src="${data.downloadUrl}" style="display: none;"></video>
+                        <div class="custom-controls">
+                            <button onclick="playVideo()">Play</button>
+                            <button onclick="pauseVideo()">Pause</button>
+                            <input type="range" id="volumeControl" min="0" max="1" step="0.1" value="1" onchange="setVolume(this.value)">
+                        </div>
+                        <br>
+                        <a id="downloadLink" href="${data.downloadUrl}" download="instagram_video.mp4">Download Video</a>
+                    `;
+                    const videoPlayer = document.getElementById('videoPlayer');
+                    videoPlayer.style.display = 'block';
+
+                    // Automatically trigger the download
+                    // const downloadLink = document.getElementById('downloadLink');
+                    // downloadLink.click();
+                } else {
+                    result.innerHTML = `<span style="color:red;">${data.error}</span>`;
+                }
+            })
+            .catch(error => {
+                spinner.style.display = 'none';  // Hide spinner if there's an error
+                console.error('Error:', error);
+                result.innerHTML = `<span style="color:red;">An error occurred. Please try again.</span>`;
+            });
+        }
+
+        function playVideo() {
+            const videoPlayer = document.getElementById('videoPlayer');
+            videoPlayer.play();
+        }
+
+        function pauseVideo() {
+            const videoPlayer = document.getElementById('videoPlayer');
+            videoPlayer.pause();
+        }
+
+        function setVolume(volume) {
+            const videoPlayer = document.getElementById('videoPlayer');
+            videoPlayer.volume = volume;
+        }
+    </script>
+</body>
+</html>
