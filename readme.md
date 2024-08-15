@@ -34,8 +34,11 @@ http://localhost:5000
 
 Usage
 1.Enter the Instagram reel URL in the input box.
+
 2.Click the **Download** button.
+
 3.The video will be previewed on the page with custom controls for playing, pausing, and adjusting volume.
+
 4.To download the video, click the **Download Video** button. The video will be downloaded directly.
 
 
