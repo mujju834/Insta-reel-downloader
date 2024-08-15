@@ -29,7 +29,7 @@ Installation
 
 Clone the repository:
 
-git clone https://github.com/mujju834/Instagram-Video-Downloader.git
+git clone https://github.com/mujju834/Insta-reel-downloader.git
 
 cd Instagram-Video-Downloader
 
